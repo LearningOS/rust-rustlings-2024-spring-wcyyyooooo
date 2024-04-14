@@ -1,11 +1,11 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
+use std::process::{id, Child};
 
 pub struct Heap<T>
 where
@@ -37,9 +37,35 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.up(self.count);
     }
-
+    fn up(&mut self, idx: usize) {
+        let parent = self.parent_idx(idx);
+        if idx > 1 && (self.comparator)(&self.items[idx], &self.items[parent]) {
+            self.items.swap(parent, idx);
+            self.up(parent);
+        }
+    }
+    pub fn down(&mut self, idx: usize) {
+        let child1 = self.left_child_idx(idx);
+        let child2 = self.right_child_idx(idx);
+        if idx >= self.len() {
+            return;
+        }
+        let mut child = 0;
+        if child1 <= self.len() && ((self.comparator)(&self.items[child1], &self.items[idx])) {
+            child = child1;
+        }
+        if child2 <= self.len() && ((self.comparator)(&self.items[child2], &self.items[child1])) {
+            child = child2;
+        }
+        if child <= self.len() && child != 0 {
+            self.items.swap(idx, child);
+            self.down(child);
+        }
+    }
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
     }
@@ -57,8 +83,7 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        0
     }
 }
 
@@ -84,8 +109,14 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            return None;
+        }
+        self.items.swap(1, self.count);
+        let v = self.items.pop();
+        self.count -= 1;
+        self.down(1);
+        return v;
     }
 }
 
